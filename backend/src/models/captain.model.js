@@ -68,6 +68,9 @@ const captainSchema = new mongoose.Schema({
       type: Number,
     },
   },
+  socketId: {
+    type: String,
+  },
 });
 
 captainSchema.methods.genAuthToken = function () {

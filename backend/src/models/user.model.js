@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = rrequire("bcryptjs");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userSchema = new mongoose.Schema({
   fullName: {
@@ -26,8 +26,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     select: false, // doesn't return password in query results
+    minlength: [6, "Password must be at least 6 characters long"],
   },
-  //! add few fields later
+  socketId: {
+    type: String,
+  },
 });
 
 userSchema.methods.genAuthToken = function () {
