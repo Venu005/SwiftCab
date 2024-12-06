@@ -1,6 +1,5 @@
 const User = require("../models/user.model");
 const { validationResult } = require("express-validator");
-const { asyncHandler } = require("../utils/asynchandler");
 const { createUser } = require("../services/user.service");
 const BlacklistToken = require("../models/blacklistToken.model");
 
