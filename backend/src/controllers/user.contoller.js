@@ -4,13 +4,42 @@ const { asyncHandler } = require("../utils/asynchandler");
 const { createUser } = require("../services/user.service");
 const BlacklistToken = require("../models/blacklistToken.model");
 
+let aj;
+
+const initializeArcjet = async () => {
+  const arcjet = await import("@arcjet/node");
+  aj = arcjet.default({
+    key: process.env.ARCJET_KEY,
+    rules: [
+      arcjet.validateEmail({
+        mode: "LIVE", 
+
+        block: ["DISPOSABLE", "INVALID", "NO_MX_RECORDS"],
+      }),
+    ],
+  });
+};
+
+initializeArcjet();
+
 module.exports.register = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
   const { fullName, email, password } = req.body;
+  const decision = await aj.protect(req, {
+    email,
+  });
+  console.log("Arcjet decision", decision);
+
+  if (decision.isDenied()) {
+    res.writeHead(403, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "Forbidden" }));
+    return;
+  }
   //password already hashed in 'pre'
+
   const userExists = await User.findOne({ email });
   if (userExists) {
     return res.status(400).json({ errors: [{ msg: "User already exists" }] });
