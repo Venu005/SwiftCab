@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { RiUserHeartLine } from "react-icons/ri";
+import { CaptainDataContext } from "../../../context/CaptainContext";
+import axios from "axios";
 export const CaptainLogin = () => {
   const [passwordVisible, setPasswordVisble] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [captainData, setCaptainData] = useState({});
-
+  const { captain, setCaptain } = useContext(CaptainDataContext);
+  const navigate = useNavigate();
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
@@ -17,13 +19,26 @@ export const CaptainLogin = () => {
   const togglePasswordVisibility = () => {
     setPasswordVisble(!passwordVisible);
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setCaptainData({
+    const captainData = {
       email: email,
       password: password,
-    });
-
+    };
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/captains/login`,
+        captainData
+      );
+      if (res.status === 200) {
+        const data = res.data.data;
+        setCaptain(data.captain);
+        localStorage.setItem("token", data.token);
+        navigate("/captain-home");
+      }
+    } catch (error) {
+      console.log(error);
+    }
     // at lst once submission happens set email and password to null
     setEmail("");
     setPassword("");

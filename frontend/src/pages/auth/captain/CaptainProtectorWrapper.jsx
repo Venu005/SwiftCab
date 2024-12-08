@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
-import { UserDataContext } from "../../../context/UserContext";
+import { CaptainDataContext } from "../../../context/CaptainContext";
 import { useNavigate } from "react-router-dom";
-import { FiLoader } from "react-icons/fi";
 import axios from "axios";
-const UserProtectorWrapper = ({ children }) => {
-  const { user, setUser } = useContext(UserDataContext);
-  const navigate = useNavigate();
+import { FiLoader } from "react-icons/fi";
+const CaptainProtectorWrapper = ({ children }) => {
+  const { captain, setCaptain } = useContext(CaptainDataContext);
   const [isLoading, setIsLoading] = useState(true);
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
   useEffect(() => {
     if (!token) {
-      navigate("/login");
+      navigate("/captain-login");
     }
     axios
-      .get(`${import.meta.env.VITE_BASE_URL}/users/profile`, {
+      .get(`${import.meta.env.VITE_BASE_URL}/captains/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -21,15 +21,16 @@ const UserProtectorWrapper = ({ children }) => {
       .then((res) => {
         if (res.status === 200) {
           const data = res.data.data;
-          setUser(data.user);
+          setCaptain(data.captain);
           setIsLoading(false);
         }
       })
       .catch((err) => {
         localStorage.removeItem("token");
-        navigate("/login");
+        navigate("/captain-login");
       });
   }, [token]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -38,7 +39,7 @@ const UserProtectorWrapper = ({ children }) => {
     );
   }
 
-  return <>{children}</>;
+  return <div>{children}</div>;
 };
 
-export default UserProtectorWrapper;
+export default CaptainProtectorWrapper;

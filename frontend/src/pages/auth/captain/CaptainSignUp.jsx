@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { RiUserHeartLine } from "react-icons/ri";
+import axios from "axios";
+import { CaptainDataContext } from "../../../context/CaptainContext";
 export const CaptainSignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,6 +14,11 @@ export const CaptainSignUp = () => {
   const [vehiclePlate, setVehiclePlate] = useState("");
   const [vehicleCapacity, setVehicleCapacity] = useState("");
   const [vehicleType, setVehicleType] = useState("");
+  const { captain, setCaptain } = useContext(CaptainDataContext);
+  const navigate = useNavigate();
+  // useEffect(() => {
+  //   console.log("Captain state updated:", captain);
+  // }, [captain]);
   const togglePasswordVisibility = () => {
     setPasswordVisble(!passwordVisible);
   };
@@ -24,9 +31,9 @@ export const CaptainSignUp = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     const captainData = {
-      fullname: {
-        firstname: firstName,
-        lastname: lastName,
+      fullName: {
+        firstName: firstName,
+        lastName: lastName,
       },
       email: email,
       password: password,
@@ -37,7 +44,16 @@ export const CaptainSignUp = () => {
         vehicleType: vehicleType,
       },
     };
-
+    const res = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/captains/register`,
+      captainData
+    );
+    if (res.status === 200) {
+      const data = res.data.data;
+      setCaptain(data.captainWithoutPassword);
+      localStorage.setItem("token", data.token);
+      navigate("/captain-home");
+    }
     setEmail("");
     setFirstName("");
     setLastName("");
@@ -98,16 +114,17 @@ export const CaptainSignUp = () => {
 
           <h3 className="text-lg font-medium mb-4">Enter Password</h3>
 
-          <div className="relative mb-3">
+          <div className="relative ">
             <input
-              className="bg-[#eeee]  rounded-lg px-4 py-2 border w-full text-lg"
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
               }}
-              required
-              type="password"
+              type={passwordVisible ? "text" : "password"}
               placeholder="password"
+              required
+              className="bg-[#eeee]  rounded-lg px-4 py-2 border w-full text-lg "
+              style={{ fontFamily: passwordVisible ? "monospace" : "initial" }}
             />
             <button
               type="button"
@@ -164,7 +181,7 @@ export const CaptainSignUp = () => {
                 Select Vehicle Type
               </option>
               <option value="car">Car</option>
-              <option value="auto">Auto</option>
+              <option value="auto-rickshaw">Auto</option>
               <option value="moto">Moto</option>
             </select>
           </div>
