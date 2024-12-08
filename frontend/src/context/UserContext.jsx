@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { UserDataContext } from "./UserDataContext";
-import PropTypes from "prop-types";
+import React, { createContext, useState } from "react";
 
 //create context
-//use context
+//use contextimport { createContext } from "react";
+
+export const UserDataContext = createContext();
 
 const UserContext = ({ children }) => {
   const [user, setUser] = useState({
@@ -15,14 +15,11 @@ const UserContext = ({ children }) => {
   });
   return (
     <div>
-      <UserDataContext.Provider value={[user, setUser]}>
+      <UserDataContext.Provider value={{ user, setUser }}>
         {children}
       </UserDataContext.Provider>
     </div>
   );
-};
-UserContext.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 export default UserContext;

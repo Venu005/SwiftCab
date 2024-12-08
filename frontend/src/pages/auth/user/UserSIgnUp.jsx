@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GiFullMotorcycleHelmet } from "react-icons/gi";
+import axios from "axios";
+import { UserDataContext } from "../../../context/UserContext";
+
 export const UserSignUp = () => {
   const [passwordVisible, setPasswordVisble] = useState(false);
   const [email, setEmail] = useState("");
@@ -10,7 +13,12 @@ export const UserSignUp = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [userData, setUserdata] = useState({});
-
+  const { user, setUser } = useContext(UserDataContext);
+  //  context is working
+  // useEffect(() => {
+  //   console.log("User state updated:", user);
+  // }, [user]);
+  const navigate = useNavigate();
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
@@ -26,16 +34,32 @@ export const UserSignUp = () => {
   const handleLastNameChange = (e) => {
     setLastName(e.target.value);
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setUserdata({
+    const newUser = {
       fullName: {
         firstName: firstName,
         lastName: lastName,
       },
       email: email,
       password: password,
-    });
+    };
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/users/register`,
+        newUser
+      );
+
+      if (res.status === 200) {
+        const data = res.data.data;
+        console.log(data);
+        setUser(data.userWithoutPassword);
+        localStorage.setItem("token", data.token);
+        navigate("/home");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+    }
 
     // at lst once submission happens set email and password to null
     setFirstName("");
@@ -105,20 +129,17 @@ export const UserSignUp = () => {
             </button>
           </div>
 
-          <button
-            type="submit"
-            className="bg-black text-white flex items-center justify-center w-full py-3 rounded-lg mt-5 text-lg"
-          >
-            Continue
+          <button className="bg-black text-white flex items-center justify-center w-full py-3 rounded-lg mt-5 text-lg">
+            Create Account
           </button>
-          <div className="flex items-center justify-center gap-x-1 mt-5 text-sm text-slate-500 ">
-            <p className="">Already have an account?</p>
-            <Link to={"/login"} className="underline hover:text-blue-600">
-              {" "}
-              Sign in
-            </Link>
-          </div>
         </form>
+        <div className="flex items-center justify-center gap-x-1 mt-5 text-sm text-slate-500 ">
+          <p className="">Already have an account?</p>
+          <Link to={"/login"} className="underline hover:text-blue-600">
+            {" "}
+            Sign in
+          </Link>
+        </div>
       </div>
       <div>
         <Link

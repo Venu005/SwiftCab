@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GiFullMotorcycleHelmet } from "react-icons/gi";
+import axios from "axios";
+import { UserDataContext } from "../../../context/UserContext";
 export const UserLogin = () => {
   const [passwordVisible, setPasswordVisble] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [userData, setUserdata] = useState({});
-
+  const { user, setUser } = useContext(UserDataContext);
+  const navigate = useNavigate();
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
@@ -17,13 +20,22 @@ export const UserLogin = () => {
   const togglePasswordVisibility = () => {
     setPasswordVisble(!passwordVisible);
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setUserdata({
+    const userData = {
       email: email,
       password: password,
-    });
-
+    };
+    const res = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/users/login`,
+      userData
+    );
+    if (res.status === 200) {
+      const data = res.data.data;
+      setUser(data.user);
+      localStorage.setItem("token", data.token);
+      navigate("/home");
+    }
     // at lst once submission happens set email and password to null
     setEmail("");
     setPassword("");

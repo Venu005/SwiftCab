@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-export const Home = () => {
+export const Landing = () => {
   return (
     <div>
       <div className="bg-cover bg-center bg-[url(https://ideogram.ai/assets/image/lossless/response/OdgFqiZ_QnibOxyjrZzZzg)]  h-screen  pt-8 flex justify-between flex-col w-full">
