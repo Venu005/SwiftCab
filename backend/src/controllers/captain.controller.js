@@ -43,7 +43,7 @@ module.exports.register = async (req, res) => {
   }
   const captain = await createCaptain({
     firstName: fullName.firstName,
-    lastLame: fullName.lastName,
+    lastName: fullName.lastName,
     email,
     password,
     color: vehicle.color,
